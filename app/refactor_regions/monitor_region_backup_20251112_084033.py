@@ -3,7 +3,7 @@ from datetime import datetime
 from app.utils.yaml_tools import save_yaml, load_yaml, list_yaml_files
 from app.utils.sidebar_tools import render_right_sidebar
 
-def render_monitor_panel():
+def render_monitor_region():
     # ================== BEGIN MONITOR PANEL ====================
         # --- Article Status ---
         st.markdown("### Article Status")

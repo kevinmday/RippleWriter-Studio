@@ -67,30 +67,61 @@ for key in REQUIRED_KEYS:
     if key not in st.session_state:
         st.session_state[key] = ""
 
-# ----------------------------------------------------------
-# Branding + Header (NO LOGO)
-# ----------------------------------------------------------
-
+# ---------------------------------------------------------------
+# Branding + Header (Padding Fix + Safe Visibility Margin)
+# ---------------------------------------------------------------
 st.markdown(
     """
-    <h1 style="margin-bottom: 0px; font-size: 2.6rem;">
-        RippleWriter Studio
-    </h1>
-    <p style="margin-top: -8px; font-size: 1.1rem; color: #ccc;">
-        New modular build — Design • Write • Analyze • Export
-    </p>
-    """,
+<style>
+/* Remove Streamlit's default excessive top padding */
+section.main > div:first-child {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* SAFE top space so the header is ALWAYS visible */
+.header-wrap {
+    margin-top: 2.2rem;      /* <-- adjust this if needed */
+    margin-bottom: 1.6rem;
+}
+
+/* Typography tuning */
+.header-wrap h1 {
+    margin-bottom: 0px;
+    font-size: 2.6rem;
+    font-weight: 600;
+}
+
+.header-wrap p {
+    margin-top: -6px;
+    font-size: 1.1rem;
+    color: #ccc;
+}
+</style>
+
+<div class="header-wrap">
+    <h1>RippleWriter Studio</h1>
+    <p>New modular build — Design • Write • Analyze • Export</p>
+</div>
+""",
     unsafe_allow_html=True
 )
 
+
+# ============================================================
+# ROUTER: Monitor → Design auto-switch (safe 2-step method)
+# ============================================================
+if st.session_state.get("go_to_design"):
+    st.session_state["go_to_design"] = False      # reset the flag
+    st.session_state["active_tab"] = "Design"     # switch tab
+    st.rerun()
+
 # ----------------------------------------------------------
-# Tabs
+# Tabs (NOW 6 TABS)
 # ----------------------------------------------------------
-tab_design, tab_write, tab_analyze, tab_export = st.tabs(
-    ["Design", "Write", "Analyze", "Export"]
+tab_design, tab_write, tab_analyze, tab_export, tab_controls, tab_monitor = st.tabs(
+    ["Design", "Write", "Analyze", "Export", "Controls", "Monitor"]
 )
-
-
 
 # ----------------------------------------------------------
 #  Global Column Styling
@@ -112,7 +143,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # ----------------------------------------------------------
 #  Safe Import Helper
 # ----------------------------------------------------------
@@ -124,59 +154,59 @@ def safe_import(module_path, function_name):
         st.error(f"⚠️ Import error in {module_path}.{function_name}: {e}")
         return None
 
-
 # ==========================================================
-#  DESIGN TAB
+#  DESIGN TAB — COLUMN-FREE PANEL
 # ==========================================================
 with tab_design:
-    colA, colB, colC = st.columns([1.2, 2.0, 1.2])
 
-    left_panel   = safe_import("app.refactor_regions.studio_panels.Design.left_panel",   "render_design_left")
-    center_panel = safe_import("app.refactor_regions.studio_panels.Design.center_panel", "render_design_center")
-    right_panel  = safe_import("app.refactor_regions.studio_panels.Design.right_panel",  "render_design_right")
+    # Remove Streamlit padding
+    st.markdown("""
+        <style>
+            section.main > div.block-container {
+                padding-top: 0rem !important;
+                margin-top: 0rem !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-    if left_panel:   left_panel(colA)
-    if center_panel: center_panel(colB)
-    if right_panel:  right_panel(colC)
+    # Import new design panel
+    design_panel = safe_import(
+        "app.refactor_regions.studio_panels.design.design_panel",
+        "render_design_panel"
+    )
 
+    # Render single-panel design UI
+    if design_panel:
+        design_panel()
 
-# ==========================================================
-#  WRITE TAB — Hybrid Fullscreen Layout
-# ==========================================================
+# ----------------------------------------------------------
+# Write Tab (FULL WIDTH – UNIFIED WRITE PANEL)
+# ----------------------------------------------------------
 with tab_write:
 
-    if "write_fullscreen" not in st.session_state:
-        st.session_state.write_fullscreen = False
+    # Remove Streamlit padding
+    st.markdown("""
+        <style>
+            section.main > div.block-container {
+                padding-top: 0rem !important;
+                margin-top: 0rem !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-    # ------------------------------------------------------
-    # Fullscreen Mode
-    # ------------------------------------------------------
-    if st.session_state.write_fullscreen:
+    st.markdown("## Write")
 
-        container = st.container()
+    # Import unified write panel
+    write_panel = safe_import(
+        "app.refactor_regions.studio_panels.write.write_panel",
+        "render_write_panel"
+    )
 
-        center_panel = safe_import(
-            "app.refactor_regions.studio_panels.Write.center_panel",
-            "render_center_panel"
-        )
-
-        if center_panel:
-            center_panel(container, fullscreen=True)
-
-    # ------------------------------------------------------
-    # Normal 3-column Mode
-    # ------------------------------------------------------
+    # Render if loaded
+    if write_panel:
+        write_panel()
     else:
-        colA, colB, colC = st.columns([1.2, 2.0, 1.2])
-
-        left_panel   = safe_import("app.refactor_regions.studio_panels.Write.left_panel",   "render_left_panel")
-        center_panel = safe_import("app.refactor_regions.studio_panels.Write.center_panel", "render_center_panel")
-        right_panel  = safe_import("app.refactor_regions.studio_panels.Write.right_panel",  "render_right_panel")
-
-        if left_panel:   left_panel(colA)
-        if center_panel: center_panel(colB, fullscreen=False)
-        if right_panel:  right_panel(colC)
-
+        st.error("Write panel failed to load.")
 
 # ----------------------------------------------------------
 # Analyze Tab
@@ -189,15 +219,15 @@ with tab_analyze:
 
     # Import modular panels
     left_panel = safe_import(
-        "app.refactor_regions.studio_panels.Analyze.left_panel",
+        "app.refactor_regions.studio_panels.analyze.left_panel",
         "render_left_panel"
     )
     center_panel = safe_import(
-        "app.refactor_regions.studio_panels.Analyze.center_panel",
+        "app.refactor_regions.studio_panels.analyze.center_panel",
         "render_center_panel"
     )
     right_panel = safe_import(
-        "app.refactor_regions.studio_panels.Analyze.right_panel",
+        "app.refactor_regions.studio_panels.analyze.right_panel",
         "render_right_panel"
     )
 
@@ -221,15 +251,15 @@ with tab_export:
     colA, colB, colC = st.columns([1.1, 2.0, 1.0])
 
     left_panel = safe_import(
-        "app.refactor_regions.studio_panels.Export.left_panel",
+        "app.refactor_regions.studio_panels.export.left_panel",
         "render_left_panel"
     )
     center_panel = safe_import(
-        "app.refactor_regions.studio_panels.Export.center_panel",
+        "app.refactor_regions.studio_panels.export.center_panel",
         "render_center_panel"
     )
     right_panel = safe_import(
-        "app.refactor_regions.studio_panels.Export.right_panel",
+        "app.refactor_regions.studio_panels.export.right_panel",
         "render_right_panel"
     )
 
@@ -238,8 +268,54 @@ with tab_export:
     if right_panel: right_panel(colC)
 
 # ----------------------------------------------------------
+# Controls Tab (FULL WIDTH – NO COLUMNS)
+# ----------------------------------------------------------
+with tab_controls:
+
+    # Remove padding
+    st.markdown("""
+        <style>
+            section.main > div.block-container {
+                padding-top: 0rem !important;
+                margin-top: 0rem !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("## Controls")
+
+    controls_panel = safe_import(
+        "app.refactor_regions.studio_panels.controls.controls_panel",
+        "render_controls_panel"
+    )
+
+    if controls_panel:
+        controls_panel()
+
+# ----------------------------------------------------------
+#  Monitor Tab
+# ----------------------------------------------------------
+with tab_monitor:
+    try:
+        monitor_region = safe_import(
+            "app.monitor.monitor_region",
+            "render_monitor_region"
+        )
+
+        if monitor_region:
+            monitor_region()
+        else:
+            st.error("⚠️ Monitor panel failed to load (import returned None).")
+
+    except Exception as e:
+        st.error(f"🔥 Monitor Panel Error: {e}")
+
+# ----------------------------------------------------------
 #  Footer
 # ----------------------------------------------------------
 st.markdown("---")
 st.caption("RippleWriter © Kevin Day — New Modular Panel Build (2025)")
+
+
+
 

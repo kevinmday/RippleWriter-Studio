@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import pathlib
 import subprocess
@@ -18,7 +18,7 @@ def render_right_sidebar():
     """Render shared right column elements across all tabs."""
     
     # --- Article Status ---
-    st.markdown("### 🗞️ Article Status")
+    st.markdown("### ??? Article Status")
     with st.container(border=True):
         st.write(f"**File:** {st.session_state.get('current_file', 'new-article.yaml')}")
         st.write(f"**Date/Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -27,13 +27,13 @@ def render_right_sidebar():
         st.caption("Auto-updates when scaffold changes")
 
     # --- RSS / Webhook Monitor ---
-    st.markdown("### 🌐 RSS / Webhook Monitor")
+    st.markdown("### ?? RSS / Webhook Monitor")
     with st.container(border=True, height=250):
         if "rss_log" not in st.session_state:
             st.session_state["rss_log"] = ["[system] waiting for RSS/webhook updates..."]
         for msg in st.session_state["rss_log"][-10:]:
             st.markdown(f"- {msg}")
-        st.button("🔄 Refresh Feed")
+        st.button("?? Refresh Feed")
 
 st.markdown("""
     <style>
@@ -1085,11 +1085,11 @@ if create_ai_btn:
             payload["generated_sections"] = sections
             save_yaml(p, payload)
 
-            st.success(f"✅ Draft {p.name} created and populated with AI assistance!")
+            st.success(f"? Draft {p.name} created and populated with AI assistance!")
             st.stop()
 
     except Exception as e:
-        st.error(f"❌ Error while creating AI-assisted draft: {e}")
+        st.error(f"? Error while creating AI-assisted draft: {e}")
 
         st.info("Choose an existing draft from the dropdown, or create a new one.")
 
@@ -1430,7 +1430,7 @@ with tab_source:
 
         # Unified image ingest UI (paste + drag/drop)
         ui_image_ingest()
-        # ✅ Right column: global article status + RSS monitor
+        # ? Right column: global article status + RSS monitor
     with colB:
         render_right_sidebar()
 

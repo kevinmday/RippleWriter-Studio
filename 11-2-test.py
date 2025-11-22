@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import pathlib
 import subprocess
@@ -146,7 +146,7 @@ def render_header():
         if logo_exists:
             st.image(str(LOGO_PNG), use_column_width=True)
         else:
-            st.markdown("### 🌀")  # fallback
+            st.markdown("### ??")  # fallback
     with col_title:
         st.markdown(
             """
@@ -199,7 +199,7 @@ def load_equations_yaml(p: pathlib.Path) -> Dict[str, Any]:
     if isinstance(raw, dict):
         return {"equations": raw}
 
-    # List form → coerce into named dict
+    # List form ? coerce into named dict
     if isinstance(raw, list):
         eqs: Dict[str, Any] = {}
         for i, item in enumerate(raw):
@@ -245,7 +245,7 @@ def bind_equation_selectbox(label: str, key_prefix: str) -> None:
     current = st.session_state.get(CURRENT_EQ_KEY, "none")
     if current not in options:
         options = [current] + options
-    labels  = {e["id"]: f'{e["name"]} — {e.get("desc","")}'[:80] for e in eqs}
+    labels  = {e["id"]: f'{e["name"]} � {e.get("desc","")}'[:80] for e in eqs}
     shown   = [labels.get(opt, opt) for opt in options]
     idx     = options.index(current)
     sel     = st.selectbox(label, shown, index=idx, key=f"{key_prefix}_eq_sb")
@@ -268,7 +268,7 @@ def preview_yaml_box(data: Dict[str, Any], filename: str = "draft.yaml") -> None
 
     # Download as a file (no need to write to disk)
     st.download_button(
-        label="⬇️ Download YAML",
+        label="?? Download YAML",
         data=yml_text.encode("utf-8"),
         file_name=filename,
         mime="text/yaml",
@@ -295,7 +295,7 @@ def normalize_equations_obj(eq_all: Any) -> Dict[str, Dict[str, Any]]:
     if isinstance(eq_all, dict):
         return eq_all
 
-    # Case C: list forms → coerce to dict
+    # Case C: list forms ? coerce to dict
     out: Dict[str, Dict[str, Any]] = {}
     if isinstance(eq_all, list):
         for item in eq_all:
@@ -543,7 +543,7 @@ def extract_sections(article: Dict[str, Any]) -> Dict[str, str]:
 
 def _count_bullets(s: str) -> int:
     # quick proxy for structure/clarity: leading hyphens/numbers
-    return sum(1 for line in s.splitlines() if line.strip().startswith(("-", "*", "•", "1.", "2.", "3.")))
+    return sum(1 for line in s.splitlines() if line.strip().startswith(("-", "*", "�", "1.", "2.", "3.")))
 
 def _count_citations(s: str) -> int:
     # quick proxy for evidence: markdown/linky bits
@@ -566,11 +566,11 @@ def extract_signals(article: Dict[str, Any]) -> Dict[str, float]:
     outline = sec["outline"]
 
     words = _safe_len(content.split())
-    coherence = min(1.0, (words / 800.0))  # longer → more developed (proxy)
+    coherence = min(1.0, (words / 800.0))  # longer ? more developed (proxy)
     evidence  = min(1.0, (_count_citations(content) / 6.0))
     clarity   = min(1.0, (_count_bullets(outline) / 8.0))
     novelty   = min(1.0, (_count_unique_terms(content) / 800.0))
-    # sentiment proxy: neutral-ish = good; we’ll keep 0.7 baseline for now
+    # sentiment proxy: neutral-ish = good; we�ll keep 0.7 baseline for now
     sentiment = 0.7
 
     return {
@@ -703,7 +703,7 @@ def article_from_source_text(
     base["slug"] = "".join(c.lower() if c.isalnum() else "-" for c in base["title"]).strip("-") or "untitled"
     return base
 
-# --- Image ingest UI (paste + drag/drop) used ONLY on Source→Draft ---
+# --- Image ingest UI (paste + drag/drop) used ONLY on Source?Draft ---
 def ui_image_ingest():
     st.markdown("### Paste or drop screenshots (images)")
 
@@ -717,7 +717,7 @@ def ui_image_ingest():
     )
 
     # Clipboard paste
-    _res = paste_image_button(label="📌 Paste image from clipboard", key="rw_pastebtn")
+    _res = paste_image_button(label="?? Paste image from clipboard", key="rw_pastebtn")
     pasted_img = None
     try:
         if _res is not None and getattr(_res, "image_data", None) is not None:
@@ -733,7 +733,7 @@ def ui_image_ingest():
         save_path = images_dir / fname
         pasted_img.save(save_path, format="PNG")
         st.session_state["rw_images"].append({"filename": fname, "path": str(save_path)})
-        st.success(f"📸 Pasted image saved → articles/images/{fname}")
+        st.success(f"?? Pasted image saved ? articles/images/{fname}")
         st.image(pasted_img, width=160, caption=fname)
 
     st.markdown("---")
@@ -759,10 +759,10 @@ def ui_image_ingest():
                 dest.write_bytes(f.getbuffer())
                 captured.append({"filename": safe, "path": str(dest)})
             except Exception as e:
-                st.warning(f"⚠️ Could not save image {f.name}: {e}")
+                st.warning(f"?? Could not save image {f.name}: {e}")
         if captured:
             st.session_state["rw_images"].extend(captured)
-            st.success(f"✅ Saved {len(captured)} image(s).")
+            st.success(f"? Saved {len(captured)} image(s).")
             for e in captured:
                 st.image(e["path"], width=160, caption=e["filename"])
 
@@ -771,7 +771,7 @@ FORMATS_FILE = ROOT / "config" / "formats.yaml"
 
 def load_format_templates() -> Dict[str, Any]:
     if not FORMATS_FILE.exists():
-        st.warning("⚠️ No format templates found in /config/formats.yaml")
+        st.warning("?? No format templates found in /config/formats.yaml")
         return {}
     try:
         return yaml.safe_load(FORMATS_FILE.read_text(encoding="utf-8")) or {}
@@ -879,7 +879,7 @@ if st.sidebar.button("Open output folder"):
 # ---------- main UI ----------
 
 tab_compose, tab_source, tab_meta, tab_preview = st.tabs(
-    ["Compose (YAML)", "Source → Draft", "Meta-Analysis", "Preview"]
+    ["Compose (YAML)", "Source ? Draft", "Meta-Analysis", "Preview"]
 )
 # -------------------------
 # Tab 1: Compose (YAML)
@@ -888,22 +888,22 @@ tab_compose, tab_source, tab_meta, tab_preview = st.tabs(
 with tab_compose:
     bind_draft_selectbox("Select draft", key_prefix="compose")
     bind_equation_selectbox("Intention Equation", key_prefix="compose")
-    # (rest of your Compose code…)
+    # (rest of your Compose code�)
 
 with tab_source:
     bind_draft_selectbox("Select draft", key_prefix="source")
     bind_equation_selectbox("Intention Equation", key_prefix="source")
-    # (rest of your Source→Draft code…)
+    # (rest of your Source?Draft code�)
 
 with tab_meta:
     bind_draft_selectbox("Select draft", key_prefix="meta")
     bind_equation_selectbox("Intention Equation", key_prefix="meta")
-    # (rest of your Meta code…)
+    # (rest of your Meta code�)
 
 with tab_preview:
     bind_draft_selectbox("Select draft", key_prefix="preview")
     bind_equation_selectbox("Intention Equation", key_prefix="preview")
-    # (rest of your Preview code…)
+    # (rest of your Preview code�)
 
 
 current_draft = st.session_state[CURRENT_DRAFT_KEY]
@@ -948,12 +948,12 @@ st.session_state["rw_current_draft"] = choice
         ]
         intention_options = [
             "None",
-            "Clarity × Credibility × Evidence",
-            "Problem → Insight → Outcome",
-            "Risk–Reward Matrix",
+            "Clarity � Credibility � Evidence",
+            "Problem ? Insight ? Outcome",
+            "Risk�Reward Matrix",
             "Causal Chain",
             "5W1H",
-            "Narrative Arc (Setup → Conflict → Resolution)"
+            "Narrative Arc (Setup ? Conflict ? Resolution)"
         ]
 
         if choice == "(new)":
@@ -1034,7 +1034,7 @@ st.session_state["rw_current_draft"] = choice
                 help="Intention framework to guide meta-analysis."
             )
 
-            if st.button("💾 Save YAML"):
+            if st.button("?? Save YAML"):
                 data["title"] = st.session_state["title"]
                 data["author"] = st.session_state["author"]
                 data["slug"] = st.session_state["slug"]
@@ -1061,7 +1061,7 @@ st.session_state["rw_current_draft"] = choice
         # Generate sections (only if a draft is open)
         gen_cols = st.columns(2)
         with gen_cols[0]:
-            if st.button("✍️ Generate sections with LLM", disabled=(choice == "(new)")):
+            if st.button("?? Generate sections with LLM", disabled=(choice == "(new)")):
                 try:
                     llm = LLMClient()
                     if mock_mode:
@@ -1089,7 +1089,7 @@ st.session_state["rw_current_draft"] = choice
         with gen_cols[1]:
             # If no specific file selected, render all articles
             paths_arg = [str(ARTICLES_DIR / choice)] if choice != "(new)" else []
-            if st.button("🛠️ Render this draft", disabled=(choice == "(new)")):
+            if st.button("??? Render this draft", disabled=(choice == "(new)")):
                 env_vars = {}
                 if openai_key:
                     env_vars["OPENAI_API_KEY"] = openai_key
@@ -1178,7 +1178,7 @@ def ensure_meta_signals(data: dict, eq_path, selected_eq):
     st.markdown("### Live article preview")
     html_path = expected_output_html(choice if 'choice' in locals() else None, data)
 
-    if st.button("🔁 Quick render & refresh preview", key="rw_quick_render"):
+    if st.button("?? Quick render & refresh preview", key="rw_quick_render"):
         env_vars = {}
         if openai_key:
             env_vars["OPENAI_API_KEY"] = openai_key
@@ -1234,7 +1234,7 @@ def ensure_meta_signals(data: dict, eq_path, selected_eq):
     st.markdown("---")
     st.subheader("Commit & Push")
     st.caption("This stages everything (including /output), commits, and pushes to origin.")
-    if st.button("🚀 Commit & Push"):
+    if st.button("?? Commit & Push"):
         try:
             msg = commit_msg or "Publish via RippleWriter Studio"
             result = commit_and_push(ROOT, msg, branch=branch)
@@ -1242,37 +1242,37 @@ def ensure_meta_signals(data: dict, eq_path, selected_eq):
         except Exception as e:
             st.error(f"Git push failed: {e}")
             st.info(
-                "If this is the first push on this machine, make sure you’re signed in to Git "
+                "If this is the first push on this machine, make sure you�re signed in to Git "
                 "and have permission to push (Git Credential Manager will usually prompt on Windows)."
             )
 
 # -------------------------
-# Tab 2: Source → Draft
+# Tab 2: Source ? Draft
 # -------------------------
 
 with tab_compose:
     bind_draft_selectbox("Select draft", key_prefix="compose")
     bind_equation_selectbox("Intention Equation", key_prefix="compose")
-    # (rest of your Compose code…)
+    # (rest of your Compose code�)
 
 with tab_source:
     bind_draft_selectbox("Select draft", key_prefix="source")
     bind_equation_selectbox("Intention Equation", key_prefix="source")
-    # (rest of your Source→Draft code…)
+    # (rest of your Source?Draft code�)
 
 with tab_meta:
     bind_draft_selectbox("Select draft", key_prefix="meta")
     bind_equation_selectbox("Intention Equation", key_prefix="meta")
-    # (rest of your Meta code…)
+    # (rest of your Meta code�)
 
 with tab_preview:
     bind_draft_selectbox("Select draft", key_prefix="preview")
     bind_equation_selectbox("Intention Equation", key_prefix="preview")
-    # (rest of your Preview code…)
+    # (rest of your Preview code�)
 
 
 with tab_source:
-    st.subheader("Source → Draft (paste or drop files)")
+    st.subheader("Source ? Draft (paste or drop files)")
     colA, colB = st.columns([2, 1])  # keep colB for future metadata/actions
 
     # ---- left: inputs ----
@@ -1280,11 +1280,11 @@ with tab_source:
         paste_text = st.text_area(
             "Paste source text (notes, transcript, links, etc.)",
             height=240,
-            placeholder="Paste raw material here…",
+            placeholder="Paste raw material here�",
         )
 
         files_up = st.file_uploader(
-            "Or drop text files (txt, md) — contents are concatenated",
+            "Or drop text files (txt, md) � contents are concatenated",
             type=["txt", "md"],
             accept_multiple_files=True,
         )
@@ -1309,22 +1309,22 @@ with tab_source:
 with tab_compose:
     bind_draft_selectbox("Select draft", key_prefix="compose")
     bind_equation_selectbox("Intention Equation", key_prefix="compose")
-    # (rest of your Compose code…)
+    # (rest of your Compose code�)
 
 with tab_source:
     bind_draft_selectbox("Select draft", key_prefix="source")
     bind_equation_selectbox("Intention Equation", key_prefix="source")
-    # (rest of your Source→Draft code…)
+    # (rest of your Source?Draft code�)
 
 with tab_meta:
     bind_draft_selectbox("Select draft", key_prefix="meta")
     bind_equation_selectbox("Intention Equation", key_prefix="meta")
-    # (rest of your Meta code…)
+    # (rest of your Meta code�)
 
 with tab_preview:
     bind_draft_selectbox("Select draft", key_prefix="preview")
     bind_equation_selectbox("Intention Equation", key_prefix="preview")
-    # (rest of your Preview code…)
+    # (rest of your Preview code�)
 
 
 with tab_meta:
@@ -1337,7 +1337,7 @@ with tab_meta:
     files = list_yaml_files()
     names = [f.name for f in files]
 
-    # Fallback picker if user hasn’t visited Compose yet
+    # Fallback picker if user hasn�t visited Compose yet
     if not choice or choice == "(new)" or not names:
         st.info("Pick or create a draft in **Compose** first. (Or select one below.)")
         choice = st.selectbox("Select draft", names, index=0 if names else None, key="meta_draft_fallback")
@@ -1364,7 +1364,7 @@ with tab_meta:
 
     eq_choice = st.selectbox(
         "Intention Equation",
-        ["None — Skip intention math."] + eq_names,
+        ["None � Skip intention math."] + eq_names,
         index=0,
         key="meta_eq"
     )
@@ -1379,7 +1379,7 @@ with tab_meta:
             sig = extract_signals(article)
 
             # Choose weights
-            if eq_choice == "None — Skip intention math.":
+            if eq_choice == "None � Skip intention math.":
                 weights = {k: 1.0 for k in sig.keys()}  # equal weights
             else:
                 weights = eq_dict.get(eq_choice, {}).get("weights", {}) or {}
@@ -1390,10 +1390,10 @@ with tab_meta:
             article.setdefault("meta", {})
             article["meta"]["ripple_score"] = round(float(score), 4)
             article["meta"]["signals"] = {k: round(float(v), 4) for k, v in sig.items()}
-            article["meta"]["equation"] = eq_choice if eq_choice != "None — Skip intention math." else "none"
+            article["meta"]["equation"] = eq_choice if eq_choice != "None � Skip intention math." else "none"
 
             save_yaml(current_path, article)
-            st.success(f"Ripple score saved to YAML → meta.ripple_score = **{score:.3f}**")
+            st.success(f"Ripple score saved to YAML ? meta.ripple_score = **{score:.3f}**")
 
             st.session_state["__last_meta_result__"] = {"score": score, "signals": sig, "weights": weights}
 
@@ -1425,7 +1425,7 @@ with tab_meta:
         st.write(
             "We extract sections and compute normalized signals "
             "(coherence, evidence, novelty, clarity, sentiment), then apply your "
-            "equation’s weights to produce a Ripple score."
+            "equation�s weights to produce a Ripple score."
         )
         st.caption("Equation source")
         st.code(str(eq_path))

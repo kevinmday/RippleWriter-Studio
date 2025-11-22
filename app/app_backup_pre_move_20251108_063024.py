@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import pathlib
 import subprocess
@@ -44,7 +44,7 @@ st.markdown("""
 def render_right_sidebar(tab_name="main"):
     """Render shared right column elements across all tabs."""
     # --- Article Status ---
-    st.markdown("### 🧩 Article Status")
+    st.markdown("### ?? Article Status")
     with st.container(border=True):
         st.write(f"**File:** {st.session_state.get('current_file', 'new-article.yaml')}")
         st.write(f"**Date/Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -53,7 +53,7 @@ def render_right_sidebar(tab_name="main"):
         st.caption("Auto-updates when scaffold changes")
 
     # --- RSS / Webhook Monitor ---
-    st.markdown("### 🌐 RSS / Webhook Monitor")
+    st.markdown("### ?? RSS / Webhook Monitor")
     with st.container(border=True, height=250):
         if "rss_log" not in st.session_state:
             st.session_state["rss_log"] = ["[system] waiting for RSS/webhook updates..."]
@@ -65,7 +65,7 @@ def render_right_sidebar(tab_name="main"):
     
     import uuid
     refresh_key = f"refresh_feed_sidebar_{tab_name}_{st.session_state.get('active_tab', 'default')}_{uuid.uuid4().hex[:8]}"
-    st.button("🔄 Refresh Feed", key=refresh_key)
+    st.button("?? Refresh Feed", key=refresh_key)
 
 
 st.markdown("""
@@ -1063,7 +1063,7 @@ st.markdown("""
 with colL:
     st.subheader("Create Scaffold")
 
-    # 🧩 Simplified single UI
+    # ?? Simplified single UI
     files = list_yaml_files()
     names = [f.name for f in files]
 
@@ -1086,7 +1086,7 @@ with colL:
 
     #st.markdown("<div style='margin-top:10px'></div>", unsafe_allow_html=True)
 
-    # 🚀 One button only
+    # ?? One button only
     
 # Right-hand column (status + monitors)
 with colR:
@@ -1111,14 +1111,14 @@ if choice == "(new)":
         "format": "Op-Ed",
         "intention_equation": "None"
     }
-    st.info("🆕 Starting a new YAML scaffold.")
+    st.info("?? Starting a new YAML scaffold.")
 else:
     current_path = ARTICLES_DIR / choice
     try:
         data = load_yaml(current_path)
-        st.success(f"✅ Loaded existing draft: {choice}")
+        st.success(f"? Loaded existing draft: {choice}")
     except FileNotFoundError:
-        st.error(f"⚠️ File not found: {current_path}")
+        st.error(f"?? File not found: {current_path}")
         data = {}
 
 
@@ -1258,7 +1258,7 @@ with gen_cols[1]:
             #        st.error("Render failed.")
             #    with st.expander("Render logs"):
             #        st.code(proc.stdout + "\n" + proc.stderr)
-    pass  # 👈 ensures the block is valid
+    pass  # ?? ensures the block is valid
     
 with colR:
         # --- Sanity Check Feedback Panel (replaces "Preview (latest build)") ---
@@ -1486,7 +1486,7 @@ with tab_source:
 
         # Unified image ingest UI (paste + drag/drop)
         ui_image_ingest()
-        # ✅ Right column: global article status + RSS monitor
+        # ? Right column: global article status + RSS monitor
     with colB:
         render_right_sidebar()
 
@@ -1497,23 +1497,23 @@ with tab_compose:
         st.stop()
     st.session_state["compose_rendered"] = True
 
-    st.markdown("### 🧱 Compose: YAML Scaffold Builder")
+    st.markdown("### ?? Compose: YAML Scaffold Builder")
 
 # --- Compose (YAML) Layout Upgrade: Three Columns ---
 with st.container():
-    st.subheader("🧱 Compose: YAML Scaffold Builder")
+    st.subheader("?? Compose: YAML Scaffold Builder")
 
     # Left = controls | Center = YAML fields | Right = feedback/monitor
     colL, colC, colR = st.columns([1.2, 2.8, 1])
 
     with colL:
-        st.markdown("### ✏️ Draft Controls")
+        st.markdown("### ?? Draft Controls")
         # You can later move draft selection dropdown or file options here
         # Example placeholder:
         st.text("Draft list and quick options will go here.")
 
     with colC:
-        st.markdown("### 🧩 YAML Fields")
+        st.markdown("### ?? YAML Fields")
         # Core YAML Fields go here:
         title = st.text_input("Title")
         author = st.text_input("Author", "Kevin Day")
@@ -1525,27 +1525,27 @@ with st.container():
         )
 
     with colR:
-        st.markdown("### 📡 Monitoring & Feedback")
+        st.markdown("### ?? Monitoring & Feedback")
         render_right_sidebar("compose")
 
 
-    st.markdown("🧭 DEBUG: This is the ONLY Save YAML block executing.", unsafe_allow_html=True)
+    st.markdown("?? DEBUG: This is the ONLY Save YAML block executing.", unsafe_allow_html=True)
 
 
 # --- Save YAML Actions (bottom-fixed container, outside tab_compose) ---
 with st.container():
     st.markdown("---")  # visual divider
-    st.markdown("💾 **YAML Actions**")
+    st.markdown("?? **YAML Actions**")
     st.write("Choose whether to stay and refine your YAML, or move straight into writing.")
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("💾 Save YAML (Stay on Compose)", key="save_yaml_bottom"):
+        if st.button("?? Save YAML (Stay on Compose)", key="save_yaml_bottom"):
             save_yaml(filename, current_yaml_text)
             st.success("YAML saved successfully. Continue refining.")
 
     with col2:
-        if st.button("🚀 Save & Move to Input", key="move_to_input_bottom"):
+        if st.button("?? Save & Move to Input", key="move_to_input_bottom"):
             save_yaml(filename, current_yaml_text)
             st.session_state.active_tab = "Input"
             st.success("YAML saved and moved to Input tab.")
@@ -1570,6 +1570,6 @@ with tab_meta:
             st.stop()
         data = load_yaml(ARTICLES_DIR / choice)
 
-    # ✅ Right column: global article status + RSS monitor
+    # ? Right column: global article status + RSS monitor
     with colB:
         render_right_sidebar()

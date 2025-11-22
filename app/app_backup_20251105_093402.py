@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import pathlib
 import subprocess
@@ -44,7 +44,7 @@ st.markdown("""
 def render_right_sidebar(tab_name="main"):
     """Render shared right column elements across all tabs."""
     # --- Article Status ---
-    st.markdown("### 🧩 Article Status")
+    st.markdown("### ?? Article Status")
     with st.container(border=True):
         st.write(f"**File:** {st.session_state.get('current_file', 'new-article.yaml')}")
         st.write(f"**Date/Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -53,7 +53,7 @@ def render_right_sidebar(tab_name="main"):
         st.caption("Auto-updates when scaffold changes")
 
     # --- RSS / Webhook Monitor ---
-    st.markdown("### 🌐 RSS / Webhook Monitor")
+    st.markdown("### ?? RSS / Webhook Monitor")
     with st.container(border=True, height=250):
         if "rss_log" not in st.session_state:
             st.session_state["rss_log"] = ["[system] waiting for RSS/webhook updates..."]
@@ -63,7 +63,7 @@ def render_right_sidebar(tab_name="main"):
 
         # --- Refresh Feed Button ---
     refresh_key = f"refresh_feed_sidebar_{tab_name}"
-    st.button("🔄 Refresh Feed", key=refresh_key)
+    st.button("?? Refresh Feed", key=refresh_key)
 
 st.markdown("""
     <style>
@@ -1040,7 +1040,7 @@ colL, colR = st.columns([3.5, 1])
 with colL:
     st.subheader("Create Scaffold")
 
-    # 🧩 Simplified single UI
+    # ?? Simplified single UI
     files = list_yaml_files()
     names = [f.name for f in files]
 
@@ -1063,12 +1063,12 @@ with colL:
 
     st.markdown("<div style='margin-top:10px'></div>", unsafe_allow_html=True)
 
-    # 🚀 One button only
-    if st.button("🚀 Create Scaffold → Go to Input", key="create_scaffold_go_input"):
+    # ?? One button only
+    if st.button("?? Create Scaffold ? Go to Input", key="create_scaffold_go_input"):
         st.session_state["rw_current_draft"] = filename
         st.session_state["rw_selected_eq"] = eq_choice
         st.session_state["rw_current_tab"] = "Input"
-        st.toast("Scaffold created — switching to Input tab...", icon="✏️")
+        st.toast("Scaffold created � switching to Input tab...", icon="??")
 
 # Right-hand column (status + monitors)
 with colR:
@@ -1093,11 +1093,11 @@ if create_ai_btn:
             payload["generated_sections"] = sections
             save_yaml(p, payload)
 
-            st.success(f"✅ Draft {p.name} created and populated with AI assistance!")
+            st.success(f"? Draft {p.name} created and populated with AI assistance!")
             st.stop()
 
     except Exception as e:
-        st.error(f"❌ Error while creating AI-assisted draft: {e}")
+        st.error(f"? Error while creating AI-assisted draft: {e}")
 
         st.info("Choose an existing draft from the dropdown, or create a new one.")
 
@@ -1438,7 +1438,7 @@ with tab_source:
 
         # Unified image ingest UI (paste + drag/drop)
         ui_image_ingest()
-        # ✅ Right column: global article status + RSS monitor
+        # ? Right column: global article status + RSS monitor
     with colB:
         render_right_sidebar()
 
@@ -1486,7 +1486,7 @@ with tab_meta:
         if not choice:
             st.stop()
         data = load_yaml(ARTICLES_DIR / choice)
-    # ✅ Right column: global article status + RSS monitor
+    # ? Right column: global article status + RSS monitor
     with colB:
         render_right_sidebar()
 

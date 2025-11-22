@@ -1,24 +1,62 @@
 import streamlit as st
 
-def render_left_panel(col):
-    with col:
-        st.subheader("✏️ Write Controls")
+def render_left_panel(state):
+    """
+    Write Tab — Left Panel
+    Clean, stable metadata controls:
+    - No Streamlit object leakage
+    - Always store primitive strings in state
+    """
 
-        st.markdown("#### Draft Manager")
-        st.text_input("Draft Name", key="write_draft_name")
+    st.markdown("### Metadata & Tools")
 
-        st.markdown("#### Model Settings")
-        st.selectbox(
-            "Model",
-            ["GPT-5 (default)", "GPT-4.1", "GPT-4.1-Turbo"],
-            key="write_model"
+    # ------------------------------
+    # Metadata Fields
+    # ------------------------------
+
+    # Title
+    state.title = st.text_input(
+        "Title",
+        value=state.title if isinstance(state.title, str) else "",
+        key="write_meta_title"
+    )
+
+    # Author
+    state.author = st.text_input(
+        "Author",
+        value=state.author if isinstance(state.author, str) else "",
+        key="write_meta_author"
+    )
+
+    # Optional: Date (if you decide to expose it)
+    if hasattr(state, "date"):
+        state.date = st.text_input(
+            "Date",
+            value=state.date if isinstance(state.date, str) else "",
+            key="write_meta_date"
         )
-        st.checkbox("Use Streaming Mode", key="write_streaming")
 
-        st.markdown("#### Generation Tools")
-        st.button("Generate Draft Structure", key="btn_generate_structure")
-        st.button("Write & Render Now", key="btn_write_now")
-        st.button("Rewrite Selected Section", key="btn_rewrite_section")
+    # ------------------------------
+    # Actions
+    # ------------------------------
 
-        st.markdown("---")
-        st.caption("Write tab control center (2025 modular architecture)")
+    st.markdown("---")
+    st.subheader("Actions")
+
+    colA, colB, colC = st.columns([1, 1, 1])
+
+    with colA:
+        if st.button("Apply Template", key="write_apply_template"):
+            state.apply_template = True
+
+    with colB:
+        if st.button("Send YAML to Editor", key="write_send_yaml"):
+            state.send_yaml = True
+
+    with colC:
+        if st.button("Clear Draft", key="write_clear_draft"):
+            state.clear_draft = True
+
+    # Controlled spacer — prevents Streamlit from leaving strange layout gaps
+    st.markdown("")
+    st.markdown("")

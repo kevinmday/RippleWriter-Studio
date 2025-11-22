@@ -1,5 +1,5 @@
-﻿# ==========================================================
-# RippleWriter Studio — Compose Region (3-Column Refactor)
+# ==========================================================
+# RippleWriter Studio � Compose Region (3-Column Refactor)
 # ==========================================================
 import streamlit as st
 import uuid
@@ -37,7 +37,7 @@ def render_compose_panel(colA, colB, colC):
 
         st.markdown("### AI Assistant")
         if st.button("Generate Sections with AI Help", key="ai_generate_sections"):
-            st.success("✨ AI Assistance triggered — sections will be generated here.")
+            st.success("? AI Assistance triggered � sections will be generated here.")
 
         st.markdown("### Intention Equation")
         equation = st.selectbox(
@@ -47,18 +47,18 @@ def render_compose_panel(colA, colB, colC):
         )
 
         st.info("Draft: (new)\nAuthor: Kevin Day")
-        st.success("✅ YAML Valid — no critical errors detected.")
+        st.success("? YAML Valid � no critical errors detected.")
 
         st.markdown("---")
         st.markdown("**YAML Actions**")
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("💾 Save YAML (Stay)", key="save_yaml_compose"):
-                st.success("✅ YAML saved. Continue refining.")
+            if st.button("?? Save YAML (Stay)", key="save_yaml_compose"):
+                st.success("? YAML saved. Continue refining.")
         with col2:
-            if st.button("➡️ Save & Move to Input", key="save_yaml_input"):
-                st.success("✅ Saved & moved to Input tab.")
+            if st.button("?? Save & Move to Input", key="save_yaml_input"):
+                st.success("? Saved & moved to Input tab.")
 
         st.caption("*Future: Ripple Feedback, Intention Matrix, etc.*")
 
@@ -69,14 +69,14 @@ def render_compose_panel(colA, colB, colC):
         st.subheader("Context Panel")
         st.write(
             """
-            🧩 This space will host live diagnostics, RippleTruth feedback, 
+            ?? This space will host live diagnostics, RippleTruth feedback, 
             or intention-based context from the current YAML draft.
 
             *Examples (future integration):*
             - Real-time FILS + UCIP health checks  
             - Intention Equation visualizations  
             - RippleSeer / RippleTruth output logs  
-            - Auto-preview of YAML → HTML render
+            - Auto-preview of YAML ? HTML render
             """
         )
-        st.caption("Connected via: `colC` → shared context panel")
+        st.caption("Connected via: `colC` ? shared context panel")

@@ -1,6 +1,6 @@
 import streamlit as st
 
-def render_monitor_panel():
+def render_monitor_region():
     # ================== BEGIN MONITOR PANEL ====================
         # --- Article Status ---
         st.markdown("### Article Status")

@@ -20,7 +20,7 @@ import streamlit as st
 # =======================
 import streamlit as st
 
-from refactor_regions.monitor_region import render_monitor_panel
+from refactor_regions.monitor_region import render_monitor_region
 from refactor_regions.controls_region import render_controls_panel
 from refactor_regions.compose_region import render_compose_panel
 
@@ -40,7 +40,7 @@ def render_main_layout():
 
     # --- Right Column: Monitor (Status, RSS, Logs)
     with col3:
-        render_monitor_panel()
+        render_monitor_region()
 
 st.set_page_config(
     page_title="RippleWriter Studio",

@@ -5,11 +5,17 @@
 
 import streamlit as st
 import yaml
-from app.utils.yaml_tools import save_yaml, load_yaml, list_yaml_files
 from datetime import date
 
+from app.utils.yaml_tools import (
+    save_yaml,
+    load_yaml,
+    list_yaml_files
+)
+
+
 # ----------------------------------------------------------
-# Helper: Safe YAML loader/dumper
+# Helper — Pretty YAML
 # ----------------------------------------------------------
 def pretty_yaml(data: dict) -> str:
     return yaml.dump(data, sort_keys=False, allow_unicode=True)
@@ -77,7 +83,7 @@ def render_design_center(colB):
                         {"title": "Methods", "content": ""},
                         {"title": "Results", "content": ""},
                         {"title": "Discussion", "content": ""},
-                        {"title": "Conclusion", "content": ""}
+                        {"title": "Conclusion", "content": ""},
                     ],
                     "references": [],
                 }
@@ -94,7 +100,7 @@ def render_design_center(colB):
                         {"title": "Opening Framing", "content": ""},
                         {"title": "Central Argument", "content": ""},
                         {"title": "Contrasting Viewpoints", "content": ""},
-                        {"title": "Conclusion", "content": ""}
+                        {"title": "Conclusion", "content": ""},
                     ],
                 }
 
@@ -175,17 +181,28 @@ def render_design_center(colB):
         yaml_text = st.text_area(
             "Edit YAML",
             value=pretty_yaml(current_yaml),
-            height=350,
+            height=300,              # FIX: prevent Streamlit from reserving infinite space
             key="yaml_editor_design"
         )
 
         # Parse updated YAML
         try:
             current_yaml = yaml.safe_load(yaml_text) or {}
-            yaml_valid = True
         except Exception as e:
-            yaml_valid = False
             st.error(f"YAML syntax error: {e}")
+
+        # --------------------------------------------------
+        # SEND TO WRITE TAB (YAML FOCUS)
+        # --------------------------------------------------
+        st.markdown("---")
+        st.subheader("Send to Write Tab")
+
+        if st.button("✈️ Send to Write (YAML Focus)", key="design_send_to_write"):
+            st.session_state["incoming_yaml"] = yaml_text
+            st.session_state["write_focus"] = "yaml_editor"
+            st.session_state["jump_to_yaml"] = True
+            st.success("Sent to Write tab!")
+            st.rerun()
 
         # --------------------------------------------------
         # Save Controls
@@ -206,7 +223,4 @@ def render_design_center(colB):
                 save_yaml(new_filename, current_yaml)
                 st.success(f"Draft saved as {new_filename}")
 
-        # --------------------------------------------------
-        # Footer
-        # --------------------------------------------------
         st.caption("Design Center — Structured Draft Builder")

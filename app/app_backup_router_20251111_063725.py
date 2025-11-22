@@ -41,7 +41,7 @@ st.set_page_config(
 import streamlit as st
 tab_controls, tab_compose, tab_meta, tab_monitor = st.tabs(["Compose", "Input", "Analyze", "Preview"])
 
-from refactor_regions.monitor_region import render_monitor_panel
+from refactor_regions.monitor_region import render_monitor_region
 from refactor_regions.controls_region import render_controls_panel
 from refactor_regions.compose_region import render_compose_panel
 
@@ -63,7 +63,7 @@ def render_main_layout():
 
     try:
         with col3:
-            render_monitor_panel(tab_monitor)
+            render_monitor_region(tab_monitor)
     except Exception as e:
         st.error(f"⚠️ Monitor panel failed: {e}")
 

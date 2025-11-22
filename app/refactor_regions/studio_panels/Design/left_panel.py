@@ -1,44 +1,45 @@
 # ==========================================================
 #  RippleWriter Studio — Design Tab (Left Panel)
-#  Unified System Controls + Draft Management + Metrics
+#  FIXED HEIGHT • CONTINUOUS • INDEPENDENT SCROLL
 # ==========================================================
 
 import streamlit as st
 import datetime
 from app.utils.yaml_tools import list_yaml_files, load_yaml
 
-
-# ----------------------------------------------------------
-# Render Left Panel
-# ----------------------------------------------------------
 def render_design_left(colA):
 
     with colA:
-        st.header("Design Controls")
+
+        # --------------------------------------------------
+        # FIX: Make left column a full-height scroll panel
+        # --------------------------------------------------
+        st.markdown("""
+<style>
+    .design-left-pane {
+        height: 88vh;              /* Full column height */
+        overflow-y: auto;          /* Independent scroll */
+        padding-right: 12px;       /* Prevent cutoff */
+    }
+</style>
+<div class="design-left-pane">
+""", unsafe_allow_html=True)
 
         # ==================================================
-        # SYSTEM STATUS / RUNTIME
+        # SYSTEM STATUS
         # ==================================================
+        st.header("Design Controls")
+
         st.subheader("🧠 System Status")
         st.markdown("**Environment:** RippleWriter Studio Modular Refactor")
         st.markdown("**Status:** 🟢 Active")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.button("🔄 Restart Session", key="design_restart_btn")
-        with col2:
-            st.button("🧹 Flush Cache", key="design_flush_btn")
-
-        st.caption("Restart clears session_state. Cache flush clears AI temp memory.")
-
-        st.divider()
-
         # ==================================================
-        # GLOBAL AI / API SETTINGS (shared across app)
+        # AI SETTINGS
         # ==================================================
         st.subheader("🔑 AI Access & Configuration")
 
-        api_key = st.text_input(
+        st.text_input(
             "OpenAI API Key",
             type="password",
             key="design_api_key"
@@ -51,13 +52,11 @@ def render_design_left(colA):
         )
 
         st.toggle("Use Streaming Mode", key="design_streaming_toggle")
-
-        st.caption("Stored per session. Will be used in Write + Analyze tabs.")
-
+        st.caption("Stored per session. Used across all tabs.")
         st.divider()
 
         # ==================================================
-        # DRAFT MANAGEMENT (structural)
+        # DRAFT MANAGEMENT
         # ==================================================
         st.subheader("📄 Draft Management")
 
@@ -66,8 +65,7 @@ def render_design_left(colA):
         except Exception:
             drafts = []
 
-        st.markdown("**Available Drafts:**")
-        st.write(f"{len(drafts)} YAML drafts found.")
+        st.markdown(f"**{len(drafts)} drafts found**")
 
         draft_choice = st.selectbox(
             "Select a draft",
@@ -75,38 +73,32 @@ def render_design_left(colA):
             key="design_left_draft_select"
         )
 
+        # ❗ REMOVED RAW YAML PREVIEW — ROOT CAUSE OF LAYOUT BLOAT
         if draft_choice != "(none)":
             st.info(f"Loaded draft: **{draft_choice}**")
-            try:
-                preview = load_yaml(draft_choice)
-                st.json(preview)
-            except:
-                st.error("YAML failed to load.")
 
         st.button("📝 New Draft", key="design_left_new_draft")
-
         st.divider()
 
         # ==================================================
-        # TEMPLATE & EQUATION PACK GUIDANCE
+        # TEMPLATE & EQUATION PACKS
         # ==================================================
         st.subheader("🧩 Template & Equation Packs")
 
         st.markdown("""
-        **RippleWriter supports structured templates:**
+**Templates Available**
+- Academic  
+- Op-Ed  
+- Legal Brief  
+- Investigative  
+- RippleTruth Fact File  
+- MarketMind Narrative  
 
-        - Academic  
-        - Op-Ed  
-        - Legal Brief  
-        - Investigative  
-        - RippleTruth Fact File  
-        - MarketMind Narrative  
-
-        **Equation Packs:**
-        - Intention Equations (FILS / UCIP / RippleScore)
-        - MarketMind Equation Suite
-        - Argument Strength Model (for op-eds)
-        """)
+**Equation Packs**
+- Intention Fields (FILS / UCIP / RippleScore)
+- MarketMind Equation Suite
+- RippleTruth Fact Scoring
+""")
 
         st.selectbox(
             "Preferred Equation Pack",
@@ -114,51 +106,46 @@ def render_design_left(colA):
                 "None",
                 "Intention Field Equations",
                 "MarketMind Equation Suite",
-                "RippleTruth Fact Grading",
+                "RippleTruth Fact Grading"
             ],
             key="design_left_eq_pack"
         )
 
-        st.caption("Pack determines available equations in the Center Panel.")
-
+        st.caption("Determines equation availability in Write tab.")
         st.divider()
 
         # ==================================================
-        # USER GUIDE (DESIGN-SPECIFIC)
+        # USER GUIDE
         # ==================================================
         with st.expander("📘 Design Tab Guide"):
             st.markdown("""
-            ### Purpose of the Design Tab
-            The Design tab structures your article **before** writing begins.
+### Purpose
+Structure your article before writing begins.
 
-            Use this tab to:
-
-            - Choose a template  
-            - Build your YAML scaffold  
-            - Organize metadata  
-            - Load/duplicate existing drafts  
-            - Select equation packs  
-            - Set AI configuration  
-
-            ### Workflow
-            1. Select a template  
-            2. Review metadata  
-            3. Edit YAML structure  
-            4. Save draft  
-            5. Move to **Write** tab for prose generation  
-            """)
+### Workflow
+1. Choose a template  
+2. Set metadata  
+3. Edit YAML structure  
+4. Save draft  
+5. Move to Write tab to begin writing  
+""")
 
         st.divider()
 
         # ==================================================
-        # LIVE DIAGNOSTICS (LIGHTWEIGHT)
+        # DIAGNOSTICS
         # ==================================================
         st.subheader("⚙️ Diagnostics Snapshot")
-
         st.markdown(f"**Last Sync:** {datetime.datetime.now().strftime('%H:%M:%S')}")
+
         st.markdown("**Active Threads:** 3")
         st.markdown("**Runtime Mode:** Dev")
 
         st.progress(85, text="System Health")
 
         st.caption("RippleWriter © 2025 — Structural Engine Ready")
+
+        # --------------------------------------------------
+        # CLOSE SCROLL CONTAINER
+        # --------------------------------------------------
+        st.markdown("</div>", unsafe_allow_html=True)

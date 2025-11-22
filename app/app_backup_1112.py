@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import pathlib
 import subprocess
@@ -1060,11 +1060,11 @@ if create_ai_btn:
             payload["generated_sections"] = sections
             save_yaml(p, payload)
 
-            st.success(f"✅ Draft {p.name} created and populated with AI assistance!")
+            st.success(f"? Draft {p.name} created and populated with AI assistance!")
             st.stop()
 
     except Exception as e:
-        st.error(f"❌ Error while creating AI-assisted draft: {e}")
+        st.error(f"? Error while creating AI-assisted draft: {e}")
 
         st.info("Choose an existing draft from the dropdown, or create a new one.")
 

@@ -22,7 +22,6 @@ def render_center_panel(col):
         # ------------------------------------------------------
         # 1. Determine source draft for export
         # ------------------------------------------------------
-        # We normalize ALL drafts into draft_text at Write tab time.
         draft = (
             st.session_state.get("draft_text")
             or st.session_state.get("draft_content")
@@ -55,9 +54,18 @@ def render_center_panel(col):
 
         sections = {
             "final_draft": draft if include_final else "",
-            "insights": st.session_state.get("insights_text", "") if include_insights else "",
-            "rippletruth": st.session_state.get("rippletruth_report", "") if include_rippletruth else "",
-            "intent_metrics": st.session_state.get("intent_metrics", "") if include_metrics else "",
+            "insights": (
+                st.session_state.get("insights_text", "")
+                if include_insights else ""
+            ),
+            "rippletruth": (
+                st.session_state.get("rippletruth_report", "")
+                if include_rippletruth else ""
+            ),
+            "intent_metrics": (
+                st.session_state.get("intent_metrics", "")
+                if include_metrics else ""
+            ),
         }
 
         # ------------------------------------------------------
@@ -82,7 +90,11 @@ def render_center_panel(col):
         # ------------------------------------------------------
         # 6. Manual Export Trigger (Download Files Panel)
         # ------------------------------------------------------
-        generate = st.button("Generate Export", type="primary", use_container_width=True)
+        generate = st.button(
+            "Generate Export",
+            type="primary",
+            use_container_width=True
+        )
 
         if generate:
             try:
@@ -99,17 +111,33 @@ def render_center_panel(col):
                 return
 
         # ------------------------------------------------------
-        # 7. Display Preview (always live)
+        # 7. Display Preview (Markdown + HTML Tabs)
         # ------------------------------------------------------
         st.markdown("---")
-        st.subheader("Preview")
+        st.subheader("Preview 🔁")
 
-        if preview_md:
-            # Show Markdown preview in the center
-            st.markdown(preview_md)
-        else:
-            st.info("Preview not available.")
+        md_tab, html_tab = st.tabs(["📝 Markdown", "🌐 HTML Preview"])
 
+        # -------- Markdown TAB --------
+        with md_tab:
+            if preview_md:
+                st.markdown(preview_md)
+            else:
+                st.info("Markdown preview not available.")
+
+        # -------- HTML TAB --------
+        with html_tab:
+            if preview_html:
+                st.components.v1.html(
+                    preview_html,
+                    height=900,
+                    scrolling=True
+                )
+            else:
+                st.info("HTML preview not available.")
+
+        # ------------------------------------------------------
         # Footer
+        # ------------------------------------------------------
         st.markdown("---")
         st.caption("Export tab — center panel engine (2025 modular architecture)")

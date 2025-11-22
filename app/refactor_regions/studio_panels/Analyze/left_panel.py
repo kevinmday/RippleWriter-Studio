@@ -4,9 +4,9 @@ def render_left_panel(col):
     with col:
         st.header("🔍 Analysis Controls", divider="gray")
 
-        # -------------------------------
+        # --------------------------------------------------
         # Load Draft Area
-        # -------------------------------
+        # --------------------------------------------------
         st.subheader("Draft Source", divider="gray")
         draft_text = st.text_area(
             "Paste draft text to analyze",
@@ -23,29 +23,53 @@ def render_left_panel(col):
 
         st.markdown("")
 
-        # -------------------------------
-        # Analysis Mode
-        # -------------------------------
+        # --------------------------------------------------
+        # Analysis Mode (HARDENED SELECTBOX)
+        # --------------------------------------------------
         st.subheader("Analysis Mode", divider="gray")
 
-        mode = st.selectbox(
-            "Choose analysis type",
-            [
-                "RippleTruth Fact Scan",
-                "Intentionality Metrics (FILS / UCIP / Drift)",
-                "Structural Coherence Map",
-                "Narrative Force Analysis",
-                "Full Composite Analysis"
-            ],
-            key="analysis_mode"
-        )
+        analysis_modes = [
+            "RippleTruth Fact Scan",
+            "Intentionality Metrics (FILS / UCIP / Drift)",
+            "Structural Coherence Map",
+            "Narrative Force Analysis",
+            "Full Composite Analysis"
+        ]
 
-        # IMPORTANT:
-        # Do NOT set st.session_state.analysis_mode here.
-        # The selectbox widget owns this key.
-        # Streamlit will raise an exception if we try to overwrite it.
+        # NEW — fully unique widget keys
+        widget_key = "analyze_mode_select"
+        shadow_key = "analyze_mode_shadow"
+
+        # Init shadow key safely
+        if shadow_key not in st.session_state:
+            st.session_state[shadow_key] = analysis_modes[0]
+
+        # HARDENED SELECTBOX
+        try:
+            mode = st.selectbox(
+                "Choose analysis type",
+                options=analysis_modes,
+                index=analysis_modes.index(st.session_state[shadow_key]),
+                key=widget_key
+            )
+        except Exception:
+            st.session_state[widget_key] = analysis_modes[0]
+            st.session_state[shadow_key] = analysis_modes[0]
+            mode = st.selectbox(
+                "Choose analysis type",
+                options=analysis_modes,
+                index=0,
+                key=widget_key
+            )
+
+        # Sync widget → shadow
+        st.session_state[shadow_key] = mode
 
         st.markdown("")
+
+        # --------------------------------------------------
+        # Run Button
+        # --------------------------------------------------
         st.subheader("Run", divider="gray")
 
         if st.button("🧠 Run Analysis", use_container_width=True):

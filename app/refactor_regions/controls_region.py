@@ -8,8 +8,8 @@ def render_compose_panel(colA, colB, colC):
         st.write("Left panel – shared tools")
     with colB:
         st.markdown("## Compose Region Active")
-    with colC:
-        st.write("Right panel – helpers")
+    #with colC:
+        #st.write("Right panel – helpers")
 
 
 def render_controls_panel():

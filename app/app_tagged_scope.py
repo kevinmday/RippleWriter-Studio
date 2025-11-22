@@ -15,7 +15,7 @@ from datetime import datetime
 import streamlit as st
 
 # --- Refactored Panels ---
-from app.refactor_regions.monitor_region import render_monitor_panel
+from app.refactor_regions.monitor_region import render_monitor_region
 from app.refactor_regions.controls_region import render_controls_panel
 from app.refactor_regions.compose_region import render_compose_panel
 

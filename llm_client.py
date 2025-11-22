@@ -1,4 +1,4 @@
-﻿import os
+import os
 import textwrap
 import yaml
 import pathlib
@@ -47,7 +47,7 @@ class LLMClient:
         
         Lede: Op-eds can be both opinionated and honest when they show their work.
 
-        Body: This piece argues for intention transparency via YAML → LLM → publish. 
+        Body: This piece argues for intention transparency via YAML ? LLM ? publish. 
         It lays out limits and cites a few sources by name.
 
         Counterpoints: LLMs hallucinate; editorial review remains essential.
@@ -81,7 +81,7 @@ class LLMClient:
         system = (
             "You are RippleWriter, a concise op-ed drafter. Structure output as:\n"
             "Lede:\nBody:\nCounterpoints:\nConclusion:\n"
-            "Follow the provided thesis, tone, audience, and outline. Keep between 700–1100 words."
+            "Follow the provided thesis, tone, audience, and outline. Keep between 700�1100 words."
         )
 
         user = (

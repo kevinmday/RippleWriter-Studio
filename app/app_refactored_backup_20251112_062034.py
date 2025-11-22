@@ -35,7 +35,7 @@ try:
 
     # --- Shared Regions (colA + colC used by all tabs) ---
     from refactor_regions.controls_region import render_controls_panel
-    from refactor_regions.monitor_region import render_monitor_panel
+    from refactor_regions.monitor_region import render_monitor_region
 
 except Exception as e:
     st.error(f"⚠️ Region imports incomplete: {e}")

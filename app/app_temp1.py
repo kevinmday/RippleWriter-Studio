@@ -44,7 +44,7 @@ st.markdown("""
 def render_right_sidebar(tab_name="main"):
     """Render shared right column elements across all tabs."""
 # --- PANELS: MONITOR ---
-render_monitor_panel()
+render_monitor_region()
 # --- END MONITOR PANEL ---
     # --- Article Status ---
     st.markdown("### Article Status")

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import os, sys, glob, pathlib, datetime
 from typing import Dict, Any, List
 import yaml
@@ -73,9 +73,9 @@ def render_post(y: Dict[str, Any], sections: Dict[str, str]) -> Dict[str, Any]:
 </head>
 <body>
   <main>
-    <p><a href='../index.html'>← Back</a></p>
+    <p><a href='../index.html'>? Back</a></p>
     <h1>{y.get('title')}</h1>
-    <p><small>{date} — {y.get('author','')}</small></p>
+    <p><small>{date} � {y.get('author','')}</small></p>
     <article>
       <h2>Lede</h2>
       <p>{lede}</p>
