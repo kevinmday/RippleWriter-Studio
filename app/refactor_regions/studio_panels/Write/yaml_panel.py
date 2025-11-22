@@ -1,5 +1,5 @@
-# ==========================================================
-#  RippleWriter Studio — Write Tab
+﻿# ==========================================================
+#  RippleWriter Studio â€” Write Tab
 #  YAML Panel (Receiver + Editor)
 # ==========================================================
 
@@ -16,7 +16,7 @@ from app.refactor_regions.studio_state.write_state import WriteState
 
 
 # ----------------------------------------------------------
-# Helper — Pretty YAML
+# Helper â€” Pretty YAML
 # ----------------------------------------------------------
 def pretty_yaml(data: dict) -> str:
     return yaml.dump(data, sort_keys=False, allow_unicode=True)
@@ -36,7 +36,7 @@ def render_yaml_panel(state: WriteState):
         state.yaml_data
     """
 
-    st.markdown("### 🗂️ YAML Structure Editor")
+    st.markdown("### ðŸ—‚ï¸ YAML Structure Editor")
 
     # ------------------------------------------------------
     # PRIORITY INPUT: YAML sent from Design Tab
@@ -93,10 +93,11 @@ def render_yaml_panel(state: WriteState):
         key="yaml_save_filename"
     )
 
-    if st.button("💾 Save YAML", key="yaml_save_btn"):
+    if st.button("ðŸ’¾ Save YAML", key="yaml_save_btn"):
         if not filename.endswith(".yaml"):
             st.error("Filename must end with `.yaml`")
         else:
             save_yaml(filename, state.yaml_data)
             state.last_saved_name = filename
             st.success(f"Saved as **{filename}**")
+

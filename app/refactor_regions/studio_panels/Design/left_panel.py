@@ -1,6 +1,6 @@
-# ==========================================================
-#  RippleWriter Studio — Design Tab (Left Panel)
-#  FIXED HEIGHT • CONTINUOUS • INDEPENDENT SCROLL
+﻿# ==========================================================
+#  RippleWriter Studio â€” Design Tab (Left Panel)
+#  FIXED HEIGHT â€¢ CONTINUOUS â€¢ INDEPENDENT SCROLL
 # ==========================================================
 
 import streamlit as st
@@ -30,14 +30,14 @@ def render_design_left(colA):
         # ==================================================
         st.header("Design Controls")
 
-        st.subheader("🧠 System Status")
+        st.subheader("ðŸ§  System Status")
         st.markdown("**Environment:** RippleWriter Studio Modular Refactor")
-        st.markdown("**Status:** 🟢 Active")
+        st.markdown("**Status:** ðŸŸ¢ Active")
 
         # ==================================================
         # AI SETTINGS
         # ==================================================
-        st.subheader("🔑 AI Access & Configuration")
+        st.subheader("ðŸ”‘ AI Access & Configuration")
 
         st.text_input(
             "OpenAI API Key",
@@ -58,7 +58,7 @@ def render_design_left(colA):
         # ==================================================
         # DRAFT MANAGEMENT
         # ==================================================
-        st.subheader("📄 Draft Management")
+        st.subheader("ðŸ“„ Draft Management")
 
         try:
             drafts = list_yaml_files()
@@ -73,17 +73,17 @@ def render_design_left(colA):
             key="design_left_draft_select"
         )
 
-        # ❗ REMOVED RAW YAML PREVIEW — ROOT CAUSE OF LAYOUT BLOAT
+        # â— REMOVED RAW YAML PREVIEW â€” ROOT CAUSE OF LAYOUT BLOAT
         if draft_choice != "(none)":
             st.info(f"Loaded draft: **{draft_choice}**")
 
-        st.button("📝 New Draft", key="design_left_new_draft")
+        st.button("ðŸ“ New Draft", key="design_left_new_draft")
         st.divider()
 
         # ==================================================
         # TEMPLATE & EQUATION PACKS
         # ==================================================
-        st.subheader("🧩 Template & Equation Packs")
+        st.subheader("ðŸ§© Template & Equation Packs")
 
         st.markdown("""
 **Templates Available**
@@ -117,7 +117,7 @@ def render_design_left(colA):
         # ==================================================
         # USER GUIDE
         # ==================================================
-        with st.expander("📘 Design Tab Guide"):
+        with st.expander("ðŸ“˜ Design Tab Guide"):
             st.markdown("""
 ### Purpose
 Structure your article before writing begins.
@@ -135,7 +135,7 @@ Structure your article before writing begins.
         # ==================================================
         # DIAGNOSTICS
         # ==================================================
-        st.subheader("⚙️ Diagnostics Snapshot")
+        st.subheader("âš™ï¸ Diagnostics Snapshot")
         st.markdown(f"**Last Sync:** {datetime.datetime.now().strftime('%H:%M:%S')}")
 
         st.markdown("**Active Threads:** 3")
@@ -143,9 +143,10 @@ Structure your article before writing begins.
 
         st.progress(85, text="System Health")
 
-        st.caption("RippleWriter © 2025 — Structural Engine Ready")
+        st.caption("RippleWriter Â© 2025 â€” Structural Engine Ready")
 
         # --------------------------------------------------
         # CLOSE SCROLL CONTAINER
         # --------------------------------------------------
         st.markdown("</div>", unsafe_allow_html=True)
+
