@@ -5,3 +5,15 @@ requests
 markdown
 python-dotenv
 watchdog
+
+# Required for Monitor tab (RSS feed parsing)
+feedparser
+
+# Required for DOCX export
+python-docx
+
+# Common RW Studio dependencies
+beautifulsoup4
+lxml
+Pillow
+
