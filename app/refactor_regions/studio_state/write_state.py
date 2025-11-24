@@ -1,72 +1,119 @@
-import streamlit as st
-from dataclasses import dataclass, field
-from typing import List, Optional
+# ==========================================================
+# RippleWriter Studio — WriteState (Upgraded Metadata Version)
+# Supports full metadata transfer from Design → Write
+# Safe-Edit Architecture (persistent JSON state)
+# ==========================================================
 
-@dataclass
+import json
+import os
+
+STATE_PATH = "app/refactor_regions/studio_state/_write_state.json"
+
+
 class WriteState:
-    """
-    Unified state manager for the Write Tab.
-    Loaded/saved through Streamlit session state.
-    """
+    def __init__(
+        self,
+        title="",
+        deck="",
+        author="Kevin Day",
 
-    # -----------------------------------------
-    # Core Article Fields
-    # -----------------------------------------
-    current_doc: str = None
-    title: str = ""
-    deck: str = ""
-    tags: List[str] = field(default_factory=list)
-    status: str = "Draft"
+        # NEW FULL METADATA FIELDS
+        source="",
+        timestamp="",
+        url="",
+        tags="",
+        status="",
 
-    # -----------------------------------------
-    # Draft + YAML text
-    # -----------------------------------------
-    draft_text: str = ""
-    yaml_text: str = ""
+        draft_text="",
+        yaml_text="",
 
-    # -----------------------------------------
-    # Section selection (future feature)
-    # -----------------------------------------
-    selected_section: Optional[str] = None
+        yaml_buffer=None,
+        write_dirty=False,
+        last_saved_name=""
+    ):
+        # PRIMARY WRITING FIELDS
+        self.title = title
+        self.deck = deck
+        self.author = author
 
-    # -----------------------------------------
-    # Action Flags (Write Engine)
-    # -----------------------------------------
-    generate_structure_flag: bool = False
-    write_render_flag: bool = False
-    rewrite_section_flag: bool = False
-    preview_flag: bool = False
+        # ★ NEW: FULL ARTICLE METADATA FIELDS
+        self.source = source
+        self.timestamp = timestamp
+        self.url = url
+        self.tags = tags
+        self.status = status
 
-    # -----------------------------------------
-    # File Actions
-    # -----------------------------------------
-    save_yaml_flag: bool = False
-    load_yaml_flag: bool = False
-    export_flag: bool = False
+        # CORE DRAFT + YAML
+        self.draft_text = draft_text
+        self.yaml_text = yaml_text
 
-    # -----------------------------------------
-    # Structure Additions
-    # -----------------------------------------
-    add_section_flag: bool = False
-    add_pullquote_flag: bool = False
-    add_factbox_flag: bool = False
-    add_image_flag: bool = False
+        # YAML buffer from Design tab (Option B)
+        self.yaml_buffer = yaml_buffer or {}
 
-    # -----------------------------------------
-    # Validation
-    # -----------------------------------------
-    validate_flag: bool = False
+        # Safe-edit flag (protects work from overwrite)
+        self.write_dirty = write_dirty
 
-    # -----------------------------------------
-    # Sync methods for Streamlit state
-    # -----------------------------------------
+        # Last saved YAML filename
+        self.last_saved_name = last_saved_name
+
+    # ------------------------------------------------------
+    # SAVE
+    # ------------------------------------------------------
+    def save(self):
+        data = {
+            "title": self.title,
+            "deck": self.deck,
+            "author": self.author,
+
+            # Save all new metadata
+            "source": self.source,
+            "timestamp": self.timestamp,
+            "url": self.url,
+            "tags": self.tags,
+            "status": self.status,
+
+            "draft_text": self.draft_text,
+            "yaml_text": self.yaml_text,
+            "yaml_buffer": self.yaml_buffer,
+
+            "write_dirty": self.write_dirty,
+            "last_saved_name": self.last_saved_name,
+        }
+
+        os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
+
+        with open(STATE_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
+    # ------------------------------------------------------
+    # LOAD
+    # ------------------------------------------------------
     @staticmethod
     def load():
-        """Load from st.session_state or create a new instance."""
-        if "write_state" not in st.session_state:
-            st.session_state.write_state = WriteState()
-        return st.session_state.write_state
+        if not os.path.exists(STATE_PATH):
+            return WriteState()
 
-    def save(self):
-        """Commit this state back into session_state."""
-        st.session_state.write_state = self
+        try:
+            with open(STATE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except:
+            return WriteState()
+
+        return WriteState(
+            title=data.get("title", ""),
+            deck=data.get("deck", ""),
+            author=data.get("author", "Kevin Day"),
+
+            source=data.get("source", ""),
+            timestamp=data.get("timestamp", ""),
+            url=data.get("url", ""),
+            tags=data.get("tags", ""),
+            status=data.get("status", ""),
+
+            draft_text=data.get("draft_text", ""),
+            yaml_text=data.get("yaml_text", ""),
+
+            yaml_buffer=data.get("yaml_buffer", {}),
+            write_dirty=data.get("write_dirty", False),
+            last_saved_name=data.get("last_saved_name", "")
+        )
