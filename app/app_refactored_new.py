@@ -5,6 +5,8 @@
 import streamlit as st
 from pathlib import Path
 import sys
+from openai import OpenAI
+import os
 
 
 # ----------------------------------------------------------
@@ -361,12 +363,44 @@ with tab_monitor:
         st.error(f"🔥 Monitor Panel Error: {e}")
 
 # ================================================
-#  RippleChat AI — Clean Chat Interface (Option B)
+#  RippleChat AI — Clean Chat Interface (Bounded + Unbounded)
 # ================================================
 with tab_ripplechat:
 
     st.markdown("## 🤖 RippleChat AI")
     st.markdown("Ask anything. Inject story context. Draft ideas. Rewrite. Analyze. Retort.")
+
+    # ------------------------------------------------
+    # Chat mode selection buttons (Bounded vs Unbounded)
+    # ------------------------------------------------
+    st.markdown("### Choose AI Mode")
+
+    colA, colB = st.columns(2)
+
+    with colA:
+        if st.button("🧠 Bounded Mode", help="Uses RippleWriter’s built-in lightweight AI.\nNo API key required.\nLocal, safe, fast."):
+            st.session_state["rw_chat_mode"] = "bounded"
+
+    with colB:
+        if st.button("🌐 Unbounded GPT Mode", help="Full-power GPT-4o mode.\nRequires your own OpenAI API key.\nBest for research, fact-checking, long-form writing."):
+            st.session_state["rw_chat_mode"] = "unbounded"
+
+    # Show which mode is active
+    active_mode = st.session_state.get("rw_chat_mode", "bounded")
+    st.info(f"**Active Mode:** {active_mode.capitalize()}")
+
+    # ------------------------------------------------
+    # API key entry if unbounded mode selected
+    # ------------------------------------------------
+    if active_mode == "unbounded":
+        if not st.session_state.get("user_openai_key"):
+            st.warning("To use Unbounded Mode, enter your OpenAI API key:")
+            key_input = st.text_input("OpenAI API Key", type="password")
+            if key_input:
+                st.session_state["user_openai_key"] = key_input
+                st.success("API key saved!")
+        else:
+            st.success("Using your OpenAI API key for GPT-4o responses.")
 
     # ------------------------------
     # Session state for chat messages
@@ -407,6 +441,7 @@ with tab_ripplechat:
     user_input = st.chat_input("Type your message...")
 
     if user_input:
+
         # show user message immediately
         st.session_state.ripplechat_messages.append(
             {"role": "user", "content": user_input}
@@ -414,21 +449,46 @@ with tab_ripplechat:
         with st.chat_message("user"):
             st.write(user_input)
 
-        # ---------------------------------
-        # Simple placeholder LLM call
-        # (you can replace with GPT-4/4o API)
-        # ---------------------------------
-        def ripple_llm(prompt: str) -> str:
-            return f"RippleChat AI received: **{prompt}**\n\n(LLM integration goes here.)"
+        # ====================================================
+        #  BOUNDED MODE — Local placeholder "Ripple LLM"
+        # ====================================================
+        def ripple_llm_local(prompt: str) -> str:
+            return (
+                f"**RippleChat (Bounded Mode)**\n"
+                f"Received: {prompt}\n\n"
+                f"(This is the built-in local model. No external API used.)"
+            )
 
-        response = ripple_llm(user_input)
+        # ====================================================
+        #  UNBOUNDED MODE — GPT-4o API call using user key
+        # ====================================================
+        def ripple_llm_gpt(prompt: str) -> str:
+            import openai
+            openai.api_key = st.session_state.get("user_openai_key")
+
+            try:
+                completion = openai.ChatCompletion.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                return completion.choices[0].message.content
+            except Exception as e:
+                return f"⚠️ Error calling OpenAI: `{e}`"
+
+        # ====================================================
+        #  DISPATCH ENGINE BASED ON ACTIVE MODE
+        # ====================================================
+        if active_mode == "bounded":
+            reply = ripple_llm_local(user_input)
+        else:
+            reply = ripple_llm_gpt(user_input)
 
         # show assistant message
         st.session_state.ripplechat_messages.append(
-            {"role": "assistant", "content": response}
+            {"role": "assistant", "content": reply}
         )
         with st.chat_message("assistant"):
-            st.write(response)
+            st.write(reply)
 
 
 # ============================================================
