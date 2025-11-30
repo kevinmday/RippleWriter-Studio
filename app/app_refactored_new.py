@@ -1,4 +1,7 @@
-# ==========================================================
+# RW deploy-touch: 2025-11-30_06-00 - testing image uploader
+# RW deploy-touch: 2025-11-30_06-15 — force redeploy
+
+#  ==========================================================
 #  RippleWriter Studio – NEW Modular Router (safe parallel)
 #  Version: Panel Architecture (Design / Write / Analyze / Export)
 # ==========================================================
