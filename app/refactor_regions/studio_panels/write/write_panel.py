@@ -1,10 +1,12 @@
-# ==========================================================
-# RippleWriter Studio — WRITE PANEL 2.1 (Non-Blocking Version)
-# • Safe full-metadata import gate (Option B)
-# • Never overwrites drafts without user action
-# • No st.stop() — does NOT block other tabs
-# • Snapshot + action buttons + red alert banner
-# ==========================================================
+# =====================================================================
+# RippleWriter Studio — WRITE PANEL v2.5 (Stable Edition)
+# • Fully compact layout
+# • No giant empty spaces (dev or cloud)
+# • Fixed container stretch bug
+# • Clean uploader (thumbnail)
+# • Always renders Preview section
+# • Non-blocking YAML import gate
+# =====================================================================
 
 import streamlit as st
 import yaml
@@ -17,17 +19,67 @@ from app.utils.yaml_tools import (
     load_model
 )
 
-# ----------------------------------------------------------
+# =====================================================================
+# GLOBAL CSS — TIGHT LAYOUT, ZERO EMPTY SPACE
+# =====================================================================
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+        /* Compress vertical spacing across all widgets */
+        .stTextInput, .stSelectbox, .stTextArea, .stFileUploader {
+            margin-bottom: 0rem !important;
+            padding-bottom: 0rem !important;
+        }
+
+        h1, h2, h3 {
+            margin-top: 0.4rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .stMarkdown {
+            margin-top: 0.2rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+
+        hr {
+            margin-top: 0.4rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        /* Prevent container auto-stretch (THIS FIXES THE BLANK SPACE) */
+        .stContainer {
+            flex-grow: 0 !important;
+        }
+
+        /* Collapse expander spacing */
+        .streamlit-expanderHeader {
+            margin-top: 0.1rem !important;
+            margin-bottom: 0.1rem !important;
+        }
+
+        /* Reduce uploader dropzone vertical size */
+        .stFileUploader > div {
+            padding-top: 0.2rem !important;
+            padding-bottom: 0.2rem !important;
+        }
+
+    </style>
+""", unsafe_allow_html=True)
+
+
+
+# =====================================================================
 # YAML IMPORT GATE — NON-BLOCKING
-# ----------------------------------------------------------
+# =====================================================================
 def render_yaml_import_gate(state: WriteState):
-    """Displays the blocking UI for metadata import — WITHOUT st.stop()."""
 
     st.markdown("---")
 
-    # RED high-alert banner
-    st.markdown(
-        """
+    st.markdown("""
         <div style="
             background-color:#6e1f1f;
             border:1px solid #aa4c4c;
@@ -39,111 +91,100 @@ def render_yaml_import_gate(state: WriteState):
             font-size:16px;">
             ⚠️ ACTION REQUIRED  
             <br>Incoming full metadata transfer from the Design tab.
-            <br><span style='opacity:0.8;'>The Write Panel is locked — use the action buttons <b>below</b> to continue.</span>
+            <br><span style='opacity:0.8;'>Use the action buttons below.</span>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
+        """, unsafe_allow_html=True)
 
-    # View incoming YAML block
-    with st.expander("📄 View Incoming Metadata (YAML)", expanded=False):
-        st.code(
-            yaml.dump(state.yaml_buffer, allow_unicode=True, sort_keys=False),
-            language="yaml"
-        )
+    with st.expander("📄 View Incoming YAML"):
+        st.code(yaml.dump(state.yaml_buffer, allow_unicode=True, sort_keys=False), language="yaml")
 
-    # Snapshot of what user currently has
-    st.subheader("📰 Current Write Panel Snapshot (Before Import)")
+    st.subheader("📰 Current Write Panel Snapshot")
+
     st.write(
-        f"**Title:** {state.title or ''}\n"
-        f"**Deck:** {state.deck or ''}\n"
-        f"**Author:** {state.author or ''}\n"
-        f"**Source:** {state.source or ''}\n"
-        f"**Timestamp:** {state.timestamp or ''}\n"
-        f"**URL:** {state.url or ''}\n"
+        f"**Title:** {state.title}\n"
+        f"**Deck:** {state.deck}\n"
+        f"**Author:** {state.author}\n"
+        f"**Source:** {state.source}\n"
+        f"**Timestamp:** {state.timestamp}\n"
+        f"**URL:** {state.url}\n"
     )
 
     st.markdown("---")
 
-    colA, colB = st.columns([1, 1])
+    colA, colB = st.columns(2)
 
-    # IMPORT BUTTON (overwrite)
     with colA:
-        if st.button("🔻 IMPORT METADATA (Overwrite Everything)", type="primary"):
-            incoming = state.yaml_buffer
+        if st.button("🔻 IMPORT METADATA (Overwrite All)", type="primary"):
+            inc = state.yaml_buffer
 
-            # Apply incoming metadata
-            state.title = incoming.get("title", "")
-            state.deck = incoming.get("summary", "")
-            state.source = incoming.get("source", "")
-            state.timestamp = incoming.get("timestamp", "")
-            state.author = incoming.get("author", "")
-            state.url = incoming.get("url", "")
-            state.draft_text = incoming.get("body", "")
+            state.title     = inc.get("title", "")
+            state.deck      = inc.get("summary", "")
+            state.source    = inc.get("source", "")
+            state.timestamp = inc.get("timestamp", "")
+            state.author    = inc.get("author", "")
+            state.url       = inc.get("url", "")
+            state.draft_text = inc.get("body", "")
 
-            state.yaml_text = yaml.dump(incoming, allow_unicode=True, sort_keys=False)
+            state.yaml_text = yaml.dump(inc, allow_unicode=True, sort_keys=False)
             state.yaml_buffer = {}
             state.write_dirty = False
             state.save()
 
-            st.success("Metadata imported into Write Panel.")
+            st.success("Metadata imported.")
             st.session_state["write_gate_resolved"] = True
 
-    # IGNORE BUTTON
     with colB:
         if st.button("❌ Ignore Incoming Metadata"):
             state.yaml_buffer = {}
             state.save()
-            st.info("Incoming metadata discarded.")
+            st.info("Metadata discarded.")
             st.session_state["write_gate_resolved"] = True
 
-    # 👇 RETURN so the rest of the Write Panel does not render
-    return True  # “Write Panel is locked” flag
+    return True
 
 
-# ----------------------------------------------------------
+
+
+# =====================================================================
 # MAIN WRITE PANEL
-# ----------------------------------------------------------
+# =====================================================================
 def render_write_panel():
 
     state = WriteState.load()
-
-    # Prevent showing partial UI when gate is active
     gate_resolved = st.session_state.get("write_gate_resolved", False)
 
-    # ------------------------------------------------------
-    # 1. Handle import gate
-    # ------------------------------------------------------
+    # ------------------------------
+    # Handle YAML Gate
+    # ------------------------------
     if state.yaml_buffer and not gate_resolved:
-        locked = render_yaml_import_gate(state)
-        if locked:
-            return  # <-- NON-BLOCKING EXIT (only exits Write Panel)
+        if render_yaml_import_gate(state):
+            return
 
-   
-    # Reset gate flag safely — only when no YAML is waiting
     if not state.yaml_buffer:
         st.session_state["write_gate_resolved"] = False
 
 
-    # ------------------------------------------------------
-    # 2. Header
-    # ------------------------------------------------------
+    # ------------------------------
+    # HEADER
+    # ------------------------------
     st.title("✍️ Write Panel")
-    st.caption("Full-width writing environment — safe-edit, full metadata.")
+    st.caption("Full-width writing environment — with compact layout.")
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 3. Load resources
-    # ------------------------------------------------------
+
+    # ------------------------------
+    # LOAD TEMPLATES + MODELS
+    # ------------------------------
     template_files = list_templates()
     template_names = [p.name for p in template_files]
 
     equations = load_model("equations.yaml")
     intention = load_model("intention.yaml")
 
-    # ------------------------------------------------------
-    # 4. Template selector
-    # ------------------------------------------------------
+
+    # ------------------------------
+    # TEMPLATE SELECTOR
+    # ------------------------------
     st.subheader("Document Template")
 
     selected_tpl = st.selectbox(
@@ -153,55 +194,42 @@ def render_write_panel():
 
     selected_template = (
         load_template(selected_tpl)
-        if selected_tpl in template_names
-        else None
+        if selected_tpl in template_names else None
     )
 
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 5. FULL METADATA INPUT (Option B)
-    # ------------------------------------------------------
+
+    # ------------------------------
+    # METADATA INPUTS
+    # ------------------------------
     st.subheader("Metadata (Full)")
 
     colA, colB = st.columns(2)
 
     with colA:
-        new_title = st.text_input("Headline", value=state.title, key="write_title")
-        new_deck = st.text_input("Summary / Deck", value=state.deck, key="write_deck")
-        new_author = st.text_input("Author", value=state.author, key="write_author")
+        t = st.text_input("Headline", value=state.title)
+        d = st.text_input("Summary / Deck", value=state.deck)
+        a = st.text_input("Author", value=state.author)
 
     with colB:
-        new_source = st.text_input("Source", value=state.source, key="write_source")
-        new_timestamp = st.text_input("Timestamp", value=state.timestamp, key="write_timestamp")
-        new_url = st.text_input("Source URL", value=state.url, key="write_url")
+        s  = st.text_input("Source", value=state.source)
+        ts = st.text_input("Timestamp", value=state.timestamp)
+        u  = st.text_input("Source URL", value=state.url)
 
-    # Save metadata changes
-    fields_changed = (
-        new_title != state.title or
-        new_deck != state.deck or
-        new_author != state.author or
-        new_source != state.source or
-        new_timestamp != state.timestamp or
-        new_url != state.url
-    )
-
-    if fields_changed:
-        state.title = new_title
-        state.deck = new_deck
-        state.author = new_author
-        state.source = new_source
-        state.timestamp = new_timestamp
-        state.url = new_url
+    if (t, d, a, s, ts, u) != (state.title, state.deck, state.author, state.source, state.timestamp, state.url):
+        state.title, state.deck, state.author = t, d, a
+        state.source, state.timestamp, state.url = s, ts, u
         state.write_dirty = True
         state.save()
 
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 6. Template YAML block
-    # ------------------------------------------------------
-    with st.expander("📄 View Template YAML Block", expanded=False):
+
+    # ------------------------------
+    # TEMPLATE YAML PREVIEW
+    # ------------------------------
+    with st.expander("📄 View Template YAML"):
         if selected_template:
             st.json(selected_template)
         else:
@@ -209,28 +237,29 @@ def render_write_panel():
 
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 7. Draft Editor
-    # ------------------------------------------------------
+
+    # ------------------------------
+    # DRAFT EDITOR
+    # ------------------------------
     st.subheader("Draft Editor")
 
-    updated_draft = st.text_area(
+    updated = st.text_area(
         "Write or Edit Draft",
         value=state.draft_text,
-        height=350,
-        key="write_draft"
+        height=320
     )
 
-    if updated_draft != state.draft_text:
-        state.draft_text = updated_draft
+    if updated != state.draft_text:
+        state.draft_text = updated
         state.write_dirty = True
         state.save()
 
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 8. Generate From Template
-    # ------------------------------------------------------
+
+    # ------------------------------
+    # AI WRITER
+    # ------------------------------
     st.subheader("AI Writer")
 
     if st.button("✨ Generate Draft From Template"):
@@ -250,17 +279,50 @@ def render_write_panel():
             state.write_dirty = True
             state.save()
 
-            st.success("Draft generated from template.")
-            st.text_area("Generated Output", generated, height=350)
+            st.success("Draft generated.")
+            st.text_area("Generated Output", generated, height=320)
 
     st.markdown("---")
 
-    # ------------------------------------------------------
-    # 9. HTML Preview
-    # ------------------------------------------------------
+
+    # =================================================================
+    # SCREENSHOT UPLOADER — FINAL FIX (NO EMPTY SPACE)
+    # =================================================================
+    st.subheader("📸 Add Images / Screenshots")
+    st.caption("Attach a small image or screenshot. Metadata will be included during export.")
+
+    # FIX: do NOT wrap in st.container() (this is what caused giant blank space)
+    colX, colY = st.columns([2, 1], vertical_alignment="top")
+
+    with colX:
+        uploaded_image = st.file_uploader(
+            "Upload Image",
+            type=["png", "jpg", "jpeg", "webp"],
+            accept_multiple_files=False
+        )
+
+        if uploaded_image:
+            st.success(f"Uploaded: {uploaded_image.name}")
+
+    with colY:
+        if uploaded_image:
+            st.image(uploaded_image, caption="Preview", width=200)
+        else:
+            st.info("No image.")
+
+    if uploaded_image:
+        st.session_state["uploaded_image"] = uploaded_image
+
+    st.markdown("---")
+
+
+    # =================================================================
+    # HTML PREVIEW — ALWAYS RENDERS
+    # =================================================================
     st.subheader("Live Preview (HTML)")
 
     safe = state.draft_text.replace("\n", "<br>")
+
     html_preview = (
         f"<h1>{state.title}</h1>"
         f"<h3>{state.deck}</h3>"
@@ -274,4 +336,4 @@ def render_write_panel():
     st.markdown(html_preview, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.caption("Write Panel — Full-Metadata + Safe-Edit (v2.1 Non-Blocking)")
+    st.caption("Write Panel v2.5 — Stable, Compact, No-Whitespace Edition")
